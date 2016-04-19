@@ -1,0 +1,5 @@
+#!/bin/bash
+echo "pkill uwsgi"
+pgrep uwsgi | xargs -n1 kill -9
+echo "pkill nginx"
+pkill nginx

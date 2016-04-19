@@ -1,0 +1,8 @@
+<uwsgi>
+	<socket>127.0.0.1:3031</socket>
+	<master/>
+	<chdir>../site1</chdir>
+	<env>DJANGO_SETTINGS_MODULE=site1.settings</env>
+	<processes>4</processes>
+	<module>site1.wsgi</module>
+</uwsgi>

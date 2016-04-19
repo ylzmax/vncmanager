@@ -1,0 +1,96 @@
+{%extends "index.html"%}
+
+{%block main%}
+
+<div class="span9">
+<form class="form-horizontal" method=POST>
+    <fieldset>
+      <div id="legend" class="">
+        <legend class="">Create New VNC Server</legend>
+      </div>
+	{%block vnccreate%}
+    <div class="control-group">
+
+          <!-- Select Basic -->
+          <label class="control-label">Site</label>
+          <div class="controls">
+            <select name="site" class="input-xlarge">
+	{%for sitef in siteinfo %} 
+      <option>{{sitef}}</option>
+	{%endfor%}
+      </select>
+          </div>
+
+        </div>
+
+    
+    <div class="control-group">
+          <label class="control-label">Geometry</label>
+          <div class="controls">
+      <!-- Multiple Radios -->
+      <label class="radio">
+        <input  checked="checked" id="cussize" value="1280x1080" name="geometry" type="radio">
+        Your Screen size <script>
+	var screensize=screen.availWidth+"x"+screen.availHeight
+	document.write(screensize)
+	document.getElementById("cussize").value=screensize
+	</script>
+      </label>
+
+      <label class="radio">
+        <input value="1920x1280" name="geometry" type="radio">
+        1920x1280
+      </label>
+      <label class="radio">
+        <input value="1280x1080" name="geometry" type="radio">
+        1280x1080
+      </label>
+
+
+
+	<label class="radio">
+        <input  name="geometry" value="custom" type="radio" >Custom
+	</label>
+	
+	<input  class="form-control" name="geometry_custom" type="text" placeholder="1024x768">
+	</div>
+        </div>
+
+    <div class="control-group">
+          <label class="control-label">Depth</label>
+          <div class="controls">
+      <!-- Multiple Radios -->
+      <label class="radio">
+        <input checked="checked" value="16" name="depth" type="radio">
+        16
+      </label>
+      <label class="radio">
+        <input value="24" name="depth" type="radio">
+        24
+      </label>
+  </div>
+
+        </div><div class="control-group">
+          <label class="control-label"></label>
+
+          <!-- Button -->
+          <div class="controls">
+            <button id="submit" class="btn btn-success" >Submit</button>
+
+            <!--button class="btn btn-success" data-toggle="modal" data-target="#myModal">Submit</button-->
+          </div>
+        </div>
+	{%endblock%}
+
+    </fieldset>
+  </form>
+</div>
+<script>
+                        $(function(){
+                                $("li.active").attr("class","")
+				$("[href='createnew']").parent().attr("class","active")
+                                       
+                                        });
+                        </script>
+
+{%endblock%}

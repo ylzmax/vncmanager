@@ -1,0 +1,24 @@
+#!/bin/bash
+siteroot=/opt/site1
+
+py=$siteroot/python/bin/python
+uwsgi=$siteroot/python/bin/uwsgi
+nginx=$siteroot/python/nginx/sbin/nginx
+
+echo "Root dir is "$siteroot
+#check db file
+if [ ! -e ./db.sqlite3 ]
+	then
+		echo "not found db file, please run initdb.sh"
+		exit 0
+fi
+
+# run uwsgi server
+
+$uwsgi -d -x vnc.xml > $siteroot/log/uwsgi.log &
+
+# run nginx server
+
+$nginx -p $siteroot/python/nginx/ &
+
+#

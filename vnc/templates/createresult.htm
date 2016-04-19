@@ -1,0 +1,15 @@
+{%extends "index.html"%}
+
+{%block main%}
+
+<div class="span9">
+<form class="form-horizontal" method=POST>
+    <fieldset>
+      <div id="legend" class="">
+        <legend class="">New VNC Server Info</legend>
+      </div>
+		<span class="label label-default"><h3>Your vnc server is</h3></span><span class="label label-success"><h3>{{res.servername}}{{res.port}}</h3></span> 
+    </fieldset>
+  </form>
+</div>
+{%endblock%}

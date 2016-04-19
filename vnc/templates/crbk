@@ -1,0 +1,32 @@
+{%extends "index.html"%}
+
+{%block main%}
+
+<div class="span9">
+<form class="form-horizontal" method=POST>
+    <fieldset>
+      <div id="legend" class="">
+        <legend class="">Create New VNC Server</legend>
+      </div>
+	{%for r in res%}
+	<p > {{r.servername}} </p>
+	<p > {{r.depth}} </p>
+	<p > {{r.port}} </p>
+	<p > {{r.geometry}} </p>
+	{%endfor%}
+    </fieldset>
+  </form>
+</div>
+<!--script-->
+$(function(){
+	//$("p#llll").text("loading");
+	//alert($("a#llll").text())
+	//$("p#llll").hide();
+	$.get("/test",function(data,status){
+		for (i in data){
+		$("p#llll").after("<p>"+i+"</p>");
+		}
+		});
+});
+<!--/script-->
+{%endblock%}

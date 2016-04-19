@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<!--[if lt IE 7 ]><html lang="en" class="ie6 ielt7 ielt8 ielt9"><![endif]--><!--[if IE 7 ]><html lang="en" class="ie7 ielt8 ielt9"><![endif]--><!--[if IE 8 ]><html lang="en" class="ie8 ielt9"><![endif]--><!--[if IE 9 ]><html lang="en" class="ie9"> <![endif]--><!--[if (gt IE 9)|!(IE)]><!--> 
+<html lang="en"><!--<![endif]--> 
+	<head>
+		<meta charset="utf-8">
+		<title>VNC Manager</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link href="/static/css/bootstrap.css" rel="stylesheet">
+		<link href="/static/css/bootstrap-responsive.min.css" rel="stylesheet">
+		<link href="/static/css/site.css" rel="stylesheet">
+		<link href="/static/css/zebra_dialog.css" rel="stylesheet">
+		<script src="/static/js/jquery.min.js"></script>
+		<script src="/static/js/bootstrap.min.js"></script>
+		<script src="/static/js/site.js"></script>
+		<script src="/static/js/jquery.blockUI.js"></script>
+		<script src="/static/js/zebra_dialog.js"></script>
+		<!--[if lt IE 9]><script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	</head>
+	<body>
+		<img alt="" id="loading" src="/static/img/loaderc.gif" style="display:none">
+		<div id="rungetvnclocal" style="display:none">{{getlocalvncinfo}}</div>
+		<div class="container">
+			<div class="navbar">
+				<div class="navbar-inner">
+					<div class="container">
+						<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </a> <a class="brand" href="/index">VNC manager</a>
+						<div class="nav-collapse">
+							<ul class="nav">
+							</ul>
+							<ul class="nav pull-right">
+								<li>
+								<div class="btn-group">
+  								<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+  								 Config 
+  								  <span class="caret"></span>
+  								</a>
+  								<ul class="dropdown-menu">
+								<li >
+									<a href="" data-toggle="modal" data-target=".bs-example-modal-sm">Change Vnc Password</a>
+								</li>
+								<li>
+									<a href="help">Help</a>
+								</li>
+  								</ul>
+								</div>
+								</li>
+								<li>
+								<a id="username" href=#>@{{username}}</a>
+								</li>
+								<li>
+									<a href="/logout">Logout</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+				{%block main%}
+				<!--div class="span11 offset1"-->
+					<div class="hero-unit h1">
+						<p class="text-center"><h2>Welcome {{username}}!</h2> </p>
+						<p>
+							To get your own VNC server.
+						</p>
+						<div class="row-fluid">
+							<br>
+							<a  class="btn btn-primary btn-large" data-toggle="modal" data-target="#creatnewwin">Create New</a> 
+						</div>
+					</div>
+					<!--div class="well summary">
+						<ul>
+							<li>
+								<a href="#"><span id=vnccount class="count"></span> VNC servers</a>
+							</li>
+							<li>
+								<a href="#"><span class="count">27</span> Tasks</a>
+							</li>
+							<li>
+								<a href="#"><span class="count">7</span> Messages</a>
+							</li>
+							<li class="last">
+								<a href="#"><span class="count">5</span> Files</a>
+							</li>
+						</ul>
+					</div-->
+					<p style="margin:auto" >
+					<h3 >
+					
+						VNC Server List 
+					<a >   (Total: <span id="vncnum" class="count" ></span> server)</a>
+					</h3>
+					</p>
+		
+					{%if warn%}
+					<h3>{{warn}}</h3>
+					{%endif%}
+
+					<table  class="table table-bordered table-striped table-condensed table-hover" margin=auto>
+						<thead>
+							<tr>
+								<th style="text-align:center">
+									Server
+								</th>
+								<th style="text-align:center">
+									Port
+								</th>
+								<th style="text-align:center">
+									IP	
+								</th>
+								<th style="text-align:center">
+									Geometry
+								</th>
+								<th style="text-align:center">
+									Depth
+								</th>
+								<th style="text-align:center">
+									Manage
+								</th>
+								<th style="text-align:center">
+									Comments	
+								</th>
+							</tr>
+						</thead>
+						<tbody id="vncinfo">
+							{%for vncin in vncinfo%}
+							<tr>
+							<td style='text-align:center'>{{vncin.servername}}</td>
+							<td style='text-align:center'>{{vncin.port}}</td>
+							<td style='text-align:center'>{{vncin.ip}}</td>
+							<td style='text-align:center'>{{vncin.geometry}}</td>
+							<td style='text-align:center'>{{vncin.depth}}</td>
+							<td style='text-align:center'>
+							<a  class='btn btn-danger btn-small' onclick=btnkill()>kill</a> 								<a  class='btn btn-warning btn-small' onclick=rec()>recreate</a> </td>
+							<td  class="commit" style='text-align:center'>{{vncin.comments}}</td>
+							</tr>
+							{%endfor%}
+						</tbody>
+					</table>
+			<script>
+			function test(){
+				//console.log($(this).parents("tr").size())
+				console.log($(this).parents("tr").children("'td:eq(6)'").size())
+				}
+
+			$('#vncinfo .commit ').on("click",function(){
+					//var pic=$(this).children('td:eq(6)')
+					var pic=$(this)
+					var cpa=$(this).parents("tr")
+					var server=cpa.children("td:eq(0)").html()
+					var port=cpa.children("td:eq(1)").html()
+					var oldcom=pic.text()
+					if (oldcom.indexOf("input-commit")<0) {
+						pic.html("<input class='input-commit'  maxlength='20' type='text' size='5'>")
+						}
+						var ic=$('.input-commit')
+						ic.focus()
+						//ic.select()
+						ic.keydown(function(){
+								if(event.keyCode==13){
+									ic.blur()
+									$.post("comment",{"ctext":ic.attr("value"),"server":server,"port":port},function(data,status){
+
+										     console.log(status)
+											})
+									pic.html(ic.attr("value"));
+									}
+								
+								})
+					
+					//$(this).html("test")
+
+						})
+			function count(){
+				//$.noConflict();
+				var vnccount=$("tr").size()-1;
+				$("span#vncnum").text(vnccount);
+				if (vnccount > 5){
+					$.Zebra_Dialog("You have more than 5 vncservers. Please kill some!")
+						}
+			}
+			//createNew func
+			function cn(){
+				var ba=$(":checked")
+				if (ba.size()==2){
+					geo=ba.eq(0).val();	
+					depth=ba.eq(1).val();	
+  						}
+				if (geo=="custom"){
+					geo=$("input:text").val();
+						}
+				//alert(geo+"  "+depth);
+				$.post("/createnew",{"geometry":geo,"depth":depth},function(data,status){
+							$.Zebra_Dialog("Your Vncserver is:<strong>"+data+"</strong><br>status:"+status,{
+							'onClose': function(caption){
+								//	alert("here");
+								location.reload()
+									}
+							});	
+							})
+							$("#creatnewwin").modal('hide')	
+							//location.reload()
+							
+				}
+
+			//changepassword func
+			$(document).ajaxStart(function(){
+				$.blockUI({
+						message:$("#loading"),
+						css:{
+						      top: ($(window).height()-40)/2+"px",
+						      left: ($(window).width()-40)/2+"px",
+						      width:"40px",
+						      border:"none"
+							},
+						overlayCSS: {backgroundColor: '#fff'}
+					});
+			}).ajaxStop($.unblockUI);
+
+			$(function(){
+				if ($("div#rungetvnclocal").html()=="True"){
+				$.get("/getlocalvnc",function(datajson,status){
+							if (status=="success"){
+								location.reload()
+								}	
+							}); //get func
+					}//if	
+					count()
+				$('.btn-danger').click(function(){
+					//location.reload()
+					//var pa=$(this).parents().parent().html()	
+					console.log($(this).size())
+					var pa=$(this).parents("tr");	
+					console.log(pa)
+					 var servern=pa.children("'td:eq(0)'").text();
+					 var serverp=pa.children("'td:eq(1)'").html();
+					var confi=confirm("Are you sure?"+"\n---serverinfo---\n"+servern+serverp);
+				//	$(this).showLoading()
+					if (confi==true){
+					//$.post("/kill",{"servername":servern,"serverport":serverp}
+					$.post("/kill",{"servername":servern,"serverport":serverp},function(data,status){
+							$.Zebra_Dialog("Sucess killed!")	
+									});
+					//$(this).hideLoading()
+					pa.remove()
+					count()
+				}// if 	
+				}) //click
+
+					$('.btn-warning').click(function(){
+					//var pa=$(this).parents().parent().html()	
+					var pare=$(this).parents("tr");	
+						
+					 var servern=pare.children("'td:eq(0)'").text();
+					 var serverp=pare.children("'td:eq(1)'").html();
+					 var servege=pare.children("'td:eq(3)'").html();
+					 var servede=pare.children("'td:eq(4)'").html();
+					var confi=confirm("Are you sure?"+"\n---serverinfo---\n"+servern+serverp);
+					if (confi==true){
+					$.post("/recreate",{"servername":servern,"serverport":serverp,"geometry":servege,"depth":servede},function(data,status){
+					//if (data.result=="sucess")
+					$.Zebra_Dialog("Your vnc server has been recreate! "+"<br>Data:"+data+"<br>status:"+status)
+});
+}
+					
+});//recreate fun
+
+});
+			function change(){
+
+				  var pass1=$("input#changepa1").val();
+				  var pass2=$("input#changepa2").val();
+					if (pass1 != pass2 ){
+						$("p#warnchangepa").html("<strong>Confirm password not match, Please reset!</strong>")
+							
+							}
+					else if(pass1.length<6){
+						$("p#warnchangepa").html("<strong>At least 6 characters</strong>")
+							}
+						else{
+						$("#changepa").modal("hide")
+						$.post("/changevncpassword",{"vncpassword":pass1},function(data,status){
+							//	if (data=="sucess"){
+								$.Zebra_Dialog("<strong>Reset Vnc Password OK!<strong>")
+											//} // if  
+								
+								}) //post function 	
+						} //else
+					
+						}
+
+			//ajax blockUI loading	
+			</script>
+
+			{%endblock%}
+                    <ul class="pager">
+						<li class="next">
+							IT Unix team 
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div id="changepa" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+		  <div class="modal-dialog modal-sm">
+    		<div class="modal-content">
+		<div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	        <h4 class="modal-title">ChangePassword</h4>
+                </div>
+		<form class="form-horizontal">
+    			<fieldset>
+				<div class="control-group">
+          			<label class="control-label" for="input01">New Password</label>
+          			<div class="controls">
+       	   		        <input id="changepa1"  type="password"  placeholder="at least 6 characters " class="input-xlarge">
+       			        <p class="help-block"></p>
+       				</div>
+       				</div>
+
+			 <div class="control-group">
+			         <label class="control-label" for="input01">Verify</label>
+			         <div class="controls">
+			          <input id="changepa2" type="password" class="input-xlarge">
+			          <p id="warnchangepa" class="help-block"></p>
+			         </div>
+			        </div>
+		    <fieldset>
+		</form>
+
+				<div class="modal-footer ">
+			        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			        <button type="button" class="btn btn-primary" onclick=change()>Change</button>
+				</div>
+
+    </div>
+  </div>
+</div>
+			<div class="modal fade" id="creatnewwin">
+			  <div class="modal-dialog">
+			    <div class="modal-content">
+			      <div class="modal-header">
+			        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			        <h4 class="modal-title">Create New</h4>
+			      </div>
+			      <div class="modal-body">
+				<form class="form-horizontal" method=POST>
+				<div class="control-group">
+          			<label class="control-label">Geometry</label>
+          			<div class="controls">
+    				  <!-- Multiple Radios -->
+    				  <label class="radio">
+    				    <input  checked="checked" id="cussize" value="1280x1080" name="geometry" type="radio">
+    				    <script>
+    				    var screensize=screen.availWidth+"x"+screen.availHeight
+    				    document.write(screensize)
+    				    document.getElementById("cussize").value=screensize
+    				    </script>
+					 (Best!Your own screen size)
+    				  </label>
+
+    				  <label class="radio">
+    				    <input value="1920x1080" name="geometry" type="radio">
+    				    1920x1080 (19 inch display)
+    				  </label>
+    				  <label class="radio">
+    				    <input value="1280x1080" name="geometry" type="radio">
+    				    1368x768 (Note Book)
+    				  </label>
+
+    				    <label class="radio">
+    				    <input  name="geometry" value="custom" type="radio" >Custom
+    				    </label>
+    				    <input  class="form-control" name="geometry_custom" type="text" placeholder="1024x768">
+    				    </div>
+    				    </div>	
+			<div class="control-group">
+			          <label class="control-label">Depth</label>
+			          <div class="controls">
+			      <!-- Multiple Radios -->
+			      <label class="radio">
+			        <input checked="checked" value="24" name="depth" type="radio">
+			        24
+			      </label>
+			      <label class="radio">
+			        <input  value="16" name="depth" type="radio">
+			        16
+			      </label>
+			  </div>
+			  </div>
+			      <div class="modal-footer">
+			        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			        <button type="button" class="btn btn-primary" onclick=cn()>CreateNew</button>
+			      </div>
+				</form>
+			    </div><!-- /.modal-content -->
+			  </div><!-- /.modal-dialog -->
+			</div><!-- /.modal -->
+				
+
+
+
+	</body>
+</html>
